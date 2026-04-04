@@ -4,7 +4,16 @@ import Layout from '../../layouts/default';
 //import Link
 import { Link } from '@inertiajs/react';
 
+//import router
+import { router } from '@inertiajs/react';
+
 export default function PostIndex({ posts, flash }) {
+
+    //method deletePost
+    const deletePost = async (id) => {
+        //send data to server
+        await router.delete(`/posts/${id}`);
+    }
 
     return (
         <Layout>
@@ -35,6 +44,7 @@ export default function PostIndex({ posts, flash }) {
                                         <td>{post.content}</td>
                                         <td className="text-center">
                                             <Link href={`/posts/${post.id}/edit`} className="btn btn-sm btn-primary me-2">EDIT</Link>
+                                            <button onClick={() => deletePost(post.id)} className="btn btn-sm btn-danger">DELETE</button>
                                         </td>
                                     </tr>
                                 ))}

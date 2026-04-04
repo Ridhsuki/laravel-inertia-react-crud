@@ -22,4 +22,38 @@ class PostController extends Controller
             'posts' => $posts
         ]);
     }
+
+    /**
+     * create
+     *
+     * @return \Inertia\Response
+     */
+    public function create()
+    {
+        return inertia('posts/create');
+    }
+
+    /**
+     * store
+     *
+     * @param  mixed $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function store(Request $request): \Illuminate\Http\RedirectResponse
+    {
+        //set validation
+        $request->validate([
+            'title' => 'required',
+            'content' => 'required',
+        ]);
+
+        //create post
+        Post::create([
+            'title' => $request->input('title'),
+            'content' => $request->input('content')
+        ]);
+
+        //redirect
+        return redirect()->route('posts.index')->with('message', 'Data Berhasil Disimpan!');
+    }
 }

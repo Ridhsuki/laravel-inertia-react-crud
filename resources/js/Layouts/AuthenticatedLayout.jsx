@@ -36,6 +36,15 @@ export default function AuthenticatedLayout({ header, children }) {
                                         Permissions
                                     </NavLink>
                                 }
+
+                                {hasAnyPermission(['roles index']) && (
+                                    <NavLink
+                                        href={route('roles.index')}
+                                        active={route().current('roles*')}
+                                    >
+                                        Roles
+                                    </NavLink>
+                                )}
                             </div>
                         </div>
 
@@ -145,6 +154,14 @@ export default function AuthenticatedLayout({ header, children }) {
                                 Permissions
                             </ResponsiveNavLink>
                         }
+                        {hasAnyPermission(['roles index']) && (
+                            <ResponsiveNavLink
+                                href={route('roles.index')}
+                                active={route().current('roles*')}
+                            >
+                                Roles
+                            </ResponsiveNavLink>
+                        )}
                     </div>
 
                     <div className="border-t border-gray-200 pb-1 pt-4">

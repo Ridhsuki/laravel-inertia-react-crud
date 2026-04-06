@@ -29,6 +29,7 @@
         "clsx": "^2.1.1",
         "react": "^19.2.1",
         "react-dom": "^19.2.1",
+        "react-select": "^5.10.2",
         "sweetalert2": "^11.26.24"
     }
 }

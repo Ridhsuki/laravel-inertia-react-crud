@@ -4,109 +4,89 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class PostController extends Controller
+class PostController extends Controller implements HasMiddleware
 {
-    /**
-     * index
-     *
-     * @return \Inertia\Response
-     */
-    public function index()
+    public static function middleware()
     {
-        //get all posts
-        $posts = Post::latest()->get();
-
-        //return view
-        return inertia('posts/index', [
-            'posts' => $posts
-        ]);
+        return [
+            new Middleware('permission:posts index', only: ['index']),
+            new Middleware('permission:posts create', only: ['store']),
+            new Middleware('permission:posts edit', only: ['update']),
+            new Middleware('permission:posts delete', only: ['destroy']),
+        ];
     }
 
     /**
-     * create
-     *
-     * @return \Inertia\Response
+     * Display a listing of the resource.
      */
-    public function create()
+    public function index(Request $request)
     {
-        return inertia('posts/create');
+        // get all posts
+        $posts = Post::with('user')
+            ->whereUserId($request->user()->id)
+            ->when($request->search, fn($query) => $query->where('title', 'like', '%' . $request->search . '%'))
+            ->latest()
+            ->paginate(10)->withQueryString();
+
+        // render view
+        return inertia('Posts/Index', ['posts' => $posts]);
     }
 
     /**
-     * store
-     *
-     * @param  mixed $request
-     * @return \Illuminate\Http\RedirectResponse
+     * Store a newly created resource in storage.
      */
-    public function store(Request $request): \Illuminate\Http\RedirectResponse
+    public function store(Request $request)
     {
-        //set validation
+        // validate request
         $request->validate([
-            'title' => 'required',
-            'content' => 'required',
+            'title' => 'required|min:3|max:255',
+            'content' => 'required|min:3|max:255',
         ]);
 
-        //create post
+        // create new post
         Post::create([
+            'user_id' => $request->user()->id,
             'title' => $request->input('title'),
-            'content' => $request->input('content')
+            'content' => $request->input('content'),
         ]);
 
-        //redirect
-        return redirect()->route('posts.index')->with('message', 'Data Berhasil Disimpan!');
+        // render view
+        return to_route('posts.index');
     }
 
     /**
-     * edit
-     *
-     * @param  mixed $post
-     * @return \Inertia\Response
+     * Update the specified resource in storage.
      */
-    public function edit(Post $post)
+    public function update(Request $request, Post $post)
     {
-        return inertia('posts/edit', [
-            'post' => $post,
-        ]);
-    }
-
-    /**
-     * update
-     *
-     * @param  mixed $request
-     * @param  mixed $post
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function update(Request $request, Post $post): \Illuminate\Http\RedirectResponse
-    {
-        //set validation
+        // validate request
         $request->validate([
-            'title' => 'required',
-            'content' => 'required',
+            'title' => 'required|min:3|max:255',
+            'content' => 'required|min:3|max:255',
         ]);
 
-        //update post
+        // update post
         $post->update([
             'title' => $request->input('title'),
-            'content' => $request->input('content')
+            'content' => $request->input('content'),
         ]);
 
-        //redirect
-        return redirect()->route('posts.index')->with('message', 'Data Berhasil Diupdate!');
+        // render view
+        return back();
     }
 
     /**
-     * destroy
-     *
-     * @param  mixed $post
-     * @return \Illuminate\Http\RedirectResponse
+     * Remove the specified resource from storage.
      */
-    public function destroy(Post $post): \Illuminate\Http\RedirectResponse
+    public function destroy(Post $post)
     {
-        //delete post
+        // delete post
         $post->delete();
 
-        //redirect
-        return redirect()->route('posts.index')->with('message', 'Data Berhasil Dihapus!');
+        // render view
+        return back();
     }
 }

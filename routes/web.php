@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
@@ -31,6 +32,9 @@ Route::middleware('auth')->group(function () {
     // users route
     Route::resource('/users', UserController::class)->except('show');
 
+    // posts route
+    Route::resource('/posts', PostController::class)->only('index', 'store', 'update', 'destroy');
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -38,4 +42,3 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__ . '/auth.php';
 
-// Route::resource('/posts', \App\Http\Controllers\PostController::class);
